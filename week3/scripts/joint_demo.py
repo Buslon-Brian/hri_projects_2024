@@ -52,9 +52,33 @@ def talker():
         js.name.append("RHand")
 
 
+        #default positions for limbs
         #js.position.append(math.radians(angle))
         js.position.append(0)
-
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
+        js.position.append(0)
         #comment this out once it gets noisy
         rospy.loginfo(js)
         
