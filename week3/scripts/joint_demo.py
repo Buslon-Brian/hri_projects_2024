@@ -46,7 +46,7 @@ def talker():
         js.name.append("RAnkleRoll")
         js.name.append("RShoulderPitch")
         js.name.append("RShoulderRoll")
-        js.name.append("RElbbowYaw")
+        js.name.append("RElbowYaw")
         js.name.append("RElbowRoll")
         js.name.append("RWristYaw")
         js.name.append("RHand")
@@ -54,6 +54,7 @@ def talker():
 
         #default positions for limbs
         #js.position.append(math.radians(angle))
+        js.position.append(math.radians(angle))
         js.position.append(0)
         js.position.append(0)
         js.position.append(0)
@@ -79,6 +80,7 @@ def talker():
         js.position.append(0)
         js.position.append(0)
         js.position.append(0)
+        
         #comment this out once it gets noisy
         rospy.loginfo(js)
         
