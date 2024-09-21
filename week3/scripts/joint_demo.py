@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # license removed for brevity
 import rospy
-import math
 from sensor_msgs.msg import JointState
-
+import math
+import time
 
 def initialize(js):
     js.header.stamp = rospy.get_rostime()
@@ -68,10 +68,38 @@ def talker(pub, rate, js):
     rate.sleep()
     pub.publish(js)
     
-def LArmPitch(pub, rate, js, deg):
-    js.position[js.name.index("LShoulderPitch")] = math.radians(deg)
+def LShoulder(pub, rate, js, p, r):
+    js.position[js.name.index("LShoulderPitch")] = math.radians(p)
+    js.position[js.name.index("LShoulderRoll")] = math.radians(r)
     rate.sleep()
     pub.publish(js)
+    initialize(js)
+
+def Head(pub, rate, js, p, y):
+    js.position[js.name.index("HeadPitch")] = math.radians(p)
+    js.position[js.name.index("HeadYaw")] = math.radians(y)
+    rate.sleep()
+    pub.publish(js)
+    initialize(js)
+
+def wave(pub, rate, js,):
+    initialize(js)
+    LShoulder(pub, rate, js, 0, 0)
+    LShoulder(pub, rate, js, -45, 0)
+    js.position[js.name.index("LHand")] = math.radians(80)
+    LShoulder(pub, rate, js, -45, 45)
+    LShoulder(pub, rate, js, -45, 0)
+    LShoulder(pub, rate, js, -45, 45)
+    LShoulder(pub, rate, js, -45, 0)
+    LShoulder(pub, rate, js, 0, 0)
+    js.position[js.name.index("LHand")] = math.radians(0)
+
+def head_shake(pub, rate, js):
+    initialize(js)
+    Head(pub, rate, js, 0, 0)
+    Head(pub, rate, js, 0, 45)
+    Head(pub, rate, js, 0, -45)
+    Head(pub, rate, js, 0, 0)
 
 if __name__ == '__main__':
     pub = rospy.Publisher('joint_states', JointState, queue_size=10)
@@ -80,10 +108,8 @@ if __name__ == '__main__':
     js = JointState()
     
     try:
-        initialize(js)
-        LArmPitch(pub, rate, js, 0)
-        LArmPitch(pub, rate, js, 90)
-
+        wave(pub, rate, js)    
+        head_shake(pub, rate, js)
         
         
     except rospy.ROSInterruptException:
