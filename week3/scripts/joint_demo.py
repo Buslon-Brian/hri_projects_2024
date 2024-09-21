@@ -101,6 +101,14 @@ def head_shake(pub, rate, js):
     Head(pub, rate, js, 0, -45)
     Head(pub, rate, js, 0, 0)
 
+def head_nod(pub, rate, js):
+    initialize(js)
+    Head(pub, rate, js, 0, 0)
+    Head(pub, rate, js, 45, 0)
+    Head(pub, rate, js, 0, 0)
+    Head(pub, rate, js, 45, 0)
+    Head(pub, rate, js, 0, 0)
+
 if __name__ == '__main__':
     pub = rospy.Publisher('joint_states', JointState, queue_size=10)
     rospy.init_node('talker', anonymous=True)
@@ -110,6 +118,7 @@ if __name__ == '__main__':
     try:
         wave(pub, rate, js)    
         head_shake(pub, rate, js)
+        head_nod(pub, rate, js)
         
         
     except rospy.ROSInterruptException:
