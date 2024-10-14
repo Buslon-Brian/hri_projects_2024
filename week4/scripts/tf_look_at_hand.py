@@ -3,13 +3,18 @@ import rospy
 
 import math
 import tf2_ros
+from sensor_msgs.msg import JointState
 import geometry_msgs.msg
 
 # this is based on the ROS tf2 tutorial: http://wiki.ros.org/tf2/Tutorials/Writing%20a%20tf2%20listener%20%28Python%29
 
-if __name__ == '__main__':
-    rospy.init_node('tf2_look_at_hand')
+def callback(data):
+    print(data)
 
+if __name__ == '__main__':
+    rospy.Subscriber('joint_states_input', JointState, callback)
+    pub = rospy.Publisher('joint_states', JointState, queue_size=10)
+    rospy.init_node('tf2_look_at_hand')
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
 
