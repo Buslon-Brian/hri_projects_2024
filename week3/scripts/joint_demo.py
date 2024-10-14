@@ -3,7 +3,6 @@
 import rospy
 from sensor_msgs.msg import JointState
 import math
-import time
 
 def initialize(js):
     js.header.stamp = rospy.get_rostime()
@@ -85,29 +84,54 @@ def Head(pub, rate, js, p, y):
 def wave(pub, rate, js,):
     initialize(js)
     LShoulder(pub, rate, js, 0, 0)
-    LShoulder(pub, rate, js, -45, 0)
-    js.position[js.name.index("LHand")] = math.radians(80)
-    LShoulder(pub, rate, js, -45, 45)
-    LShoulder(pub, rate, js, -45, 0)
-    LShoulder(pub, rate, js, -45, 45)
-    LShoulder(pub, rate, js, -45, 0)
-    LShoulder(pub, rate, js, 0, 0)
-    js.position[js.name.index("LHand")] = math.radians(0)
+    for i in range(0,-45, -5):
+        LShoulder(pub, rate, js, i, 0)
+    
+    
+    # js.position[js.name.index("LHand")] = math.radians(80)
+   
+    for i in range(0, 45, 5):
+        LShoulder(pub, rate, js, -45, i)
+
+    for i in range(45, 0, -5):        
+        LShoulder(pub, rate, js, -45, i)
+    
+    for i in range(0, 45, 5):
+        LShoulder(pub, rate, js, -45, i)
+    
+    for i in range(45, 0, -5):        
+        LShoulder(pub, rate, js, -45, i)
+    
+    for i in range(-45, 0, 5):
+        LShoulder(pub, rate, js, i, 0)
+   
+    # js.position[js.name.index("LHand")] = math.radians(0)
 
 def head_shake(pub, rate, js):
     initialize(js)
-    Head(pub, rate, js, 0, 0)
-    Head(pub, rate, js, 0, 45)
-    Head(pub, rate, js, 0, -45)
-    Head(pub, rate, js, 0, 0)
+    for i in range(0, 45, 5):
+        Head(pub, rate, js, 0, i)
+        
+    for i in range (45, -45, -5):        
+        Head(pub, rate, js, 0, i)
+
+    for i in range(-45, 0, 5):
+        Head(pub, rate, js, 0, i)
 
 def head_nod(pub, rate, js):
     initialize(js)
-    Head(pub, rate, js, 0, 0)
-    Head(pub, rate, js, 45, 0)
-    Head(pub, rate, js, 0, 0)
-    Head(pub, rate, js, 45, 0)
-    Head(pub, rate, js, 0, 0)
+    
+    for i in range(0, 45 , 5):
+        Head(pub, rate, js, i, 0)
+    
+    for i in range(45, 0, -5):
+        Head(pub, rate, js, i, 0)
+        
+    for i in range(0, 45 , 5):
+        Head(pub, rate, js, i, 0)
+    
+    for i in range(45, 0, -5):
+        Head(pub, rate, js, i, 0)
 
 if __name__ == '__main__':
     pub = rospy.Publisher('joint_states', JointState, queue_size=10)
