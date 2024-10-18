@@ -8,32 +8,58 @@ import geometry_msgs.msg
 
 # this is based on the ROS tf2 tutorial: http://wiki.ros.org/tf2/Tutorials/Writing%20a%20tf2%20listener%20%28Python%29
  
-prev_pitch = 0
+
 
 def callback(data):
     overwrite = JointState()
     overwrite.header = data.header
     overwrite.name = list(data.name)
     overwrite.position = list(data.position)
-    # pub.publish(overwrite) #probably causes head stuttering
-    # rate.sleep() #section can be delayed unless Rate is large
-    # print("why so delayed?") 
 
     try:
-        trans = tfBuffer.lookup_transform('Head', 'LFinger13_link', rospy.Time(0))
-        hf_pitch = math.atan2(trans.transform.translation.x, trans.transform.translation.z)
-        hf_yaw = math.atan2(trans.transform.translation.y, trans.transform.translation.x)
-        overwrite.position[overwrite.name.index("HeadPitch")] = math.radians(hf_pitch*40)
-        overwrite.position[overwrite.name.index("HeadYaw")] = math.radians(hf_yaw*40)
+        
+        trans = tfBuffer.lookup_transform('Head', 'LForeArm', rospy.Time(0))    
+        hf_angle = math.atan2(trans.transform.translation.x, trans.transform.translation.z)
 
-        pub.publish(overwrite)
-        print(overwrite)
+        pitch_index = overwrite.name.index("HeadPitch")
+        current_pitch = overwrite.position[pitch_index]
+        angle_difference = hf_angle - current_pitch
+    
+        print("initial pitch:" + str(math.degrees(overwrite.position[overwrite.name.index("HeadPitch")])))
+        print("initial angle:" + str(math.degrees(hf_angle)))
+        print("initial angle difference:" + str(math.degrees(angle_difference)))
+        print(" ")
+
+        if abs(angle_difference) > math.radians(1): #skip overwriting for mall angle differences
+            print("overwriting")
+            print(" ")
+            overwrite.position[pitch_index] += angle_difference
+            pub.publish(overwrite)
+        
+        else:
+            print("skipping")
+            print(" ")
+            pub.publish(overwrite)
+        
         rate.sleep()
+        
+        hf_angle = math.atan2(trans.transform.translation.x, trans.transform.translation.z)
+        angle_difference = hf_angle - overwrite.position[overwrite.name.index("HeadPitch")]
+        
+        print("final pitch:" + str(math.degrees(overwrite.position[overwrite.name.index("HeadPitch")])))
+        print("final angle:" + str(math.degrees(hf_angle)))
+        print("final angle difference:" + str(math.degrees(angle_difference)))
+        print("////")
+        print(" ")
+        
 
+        
+        
     except (tf2_ros.LookupException):
         print("Failed to get transform, skipping")
         pub.publish(overwrite)
         return    
+
 
 if __name__ == '__main__':
     rospy.init_node('tf2_look_at_hand')
@@ -44,10 +70,12 @@ if __name__ == '__main__':
     
     pub = rospy.Publisher('joint_states', JointState, queue_size=10)  
     rospy.Subscriber('joint_states_input', JointState, callback)    
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(10)
 
     init = JointState() #doesn't fix transform issue
     pub.publish(init)
     rate.sleep()
     
     rospy.spin()
+
+
