@@ -17,43 +17,25 @@ def callback(data):
     overwrite.position = list(data.position)
 
     try:
-        
         trans = tfBuffer.lookup_transform('Head', 'LForeArm', rospy.Time(0))    
-        hf_angle = math.atan2(trans.transform.translation.x, trans.transform.translation.z)
+        hf_pitch = math.atan2(trans.transform.translation.z, trans.transform.translation.x)
+        hf_yaw = math.atan2(trans.transform.translation.x, trans.transform.translation.y)
+        diffp = math.degrees(overwrite.position[overwrite.name.index("HeadPitch")] - hf_pitch )
+        diffa = math.degrees(overwrite.position[overwrite.name.index("HeadYaw")] - hf_yaw)
 
-        pitch_index = overwrite.name.index("HeadPitch")
-        current_pitch = overwrite.position[pitch_index]
-        angle_difference = hf_angle - current_pitch
-    
-        print("initial pitch:" + str(math.degrees(overwrite.position[overwrite.name.index("HeadPitch")])))
-        print("initial angle:" + str(math.degrees(hf_angle)))
-        print("initial angle difference:" + str(math.degrees(angle_difference)))
-        print(" ")
 
-        if abs(angle_difference) > math.radians(1): #skip overwriting for mall angle differences
-            print("overwriting")
-            print(" ")
-            overwrite.position[pitch_index] += angle_difference
-            pub.publish(overwrite)
+        # if the differenece of angles between pitch and yaw are near identical, do nothing
+        if abs(diffa) < 1 and abs(diffp) < 1:
+            print("skip")
+            return
         
         else:
-            print("skipping")
-            print(" ")
-            pub.publish(overwrite)
-        
-        rate.sleep()
-        
-        hf_angle = math.atan2(trans.transform.translation.x, trans.transform.translation.z)
-        angle_difference = hf_angle - overwrite.position[overwrite.name.index("HeadPitch")]
-        
-        print("final pitch:" + str(math.degrees(overwrite.position[overwrite.name.index("HeadPitch")])))
-        print("final angle:" + str(math.degrees(hf_angle)))
-        print("final angle difference:" + str(math.degrees(angle_difference)))
-        print("////")
-        print(" ")
-        
+            print("overwrite")
+            overwrite.position[overwrite.name.index("HeadPitch")] = hf_pitch
+            overwrite.position[overwrite.name.index("HeadYaw")] = hf_yaw
 
-        
+        pub.publish(overwrite)
+        rate.sleep()
         
     except (tf2_ros.LookupException):
         print("Failed to get transform, skipping")
