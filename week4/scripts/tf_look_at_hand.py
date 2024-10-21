@@ -7,8 +7,8 @@ from sensor_msgs.msg import JointState
 import geometry_msgs.msg
 
 # this is based on the ROS tf2 tutorial: http://wiki.ros.org/tf2/Tutorials/Writing%20a%20tf2%20listener%20%28Python%29
- 
 
+hf_pitch = 0
 
 def callback(data):
     overwrite = JointState()
@@ -16,23 +16,32 @@ def callback(data):
     overwrite.name = list(data.name)
     overwrite.position = list(data.position)
 
+    print(overwrite.position)
     try:
-        trans = tfBuffer.lookup_transform('Head', 'LForeArm', rospy.Time(0))    
-        hf_pitch = math.atan2(trans.transform.translation.z, trans.transform.translation.x)
-        hf_yaw = math.atan2(trans.transform.translation.x, trans.transform.translation.y)
-        diffp = math.degrees(overwrite.position[overwrite.name.index("HeadPitch")] - hf_pitch )
-        diffa = math.degrees(overwrite.position[overwrite.name.index("HeadYaw")] - hf_yaw)
+        trans = tfBuffer.lookup_transform('Head', 'l_gripper', rospy.Time(0))    
+        trans2 = tfBuffer.lookup_transform('torso', 'l_gripper', rospy.Time(0))    
+        hf_pitch = math.radians(45)
+        hf_yaw = 0
+        if len(overwrite.position) != 0:
+            hf_yaw = math.atan2(trans2.transform.translation.y, trans2.transform.translation.x)
+        hf_pitch += math.atan2(-trans2.transform.translation.z, trans2.transform.translation.x)
+        
+        
+
+        # hf_yaw = math.atan2(trans.transform.translation.x, trans.transform.translation.y)
+        # diffp = math.degrees(overwrite.position[overwrite.name.index("HeadPitch")] - hf_pitch )
+        # diffa = math.degrees(overwrite.position[overwrite.name.index("HeadYaw")] - hf_yaw)
+ 
 
 
         # if the differenece of angles between pitch and yaw are near identical, do nothing
-        if abs(diffa) < 1 and abs(diffp) < 1:
-            print("skip")
-            return
+        # if abs(diffa) < 1 and abs(diffp) < 1:
+        #     print("skip")
+        #     return
         
-        else:
-            print("overwrite")
-            overwrite.position[overwrite.name.index("HeadPitch")] = hf_pitch
-            overwrite.position[overwrite.name.index("HeadYaw")] = hf_yaw
+        # else:
+        overwrite.position[overwrite.name.index("HeadPitch")] = hf_pitch
+        overwrite.position[overwrite.name.index("HeadYaw")] = hf_yaw
 
         pub.publish(overwrite)
         rate.sleep()
