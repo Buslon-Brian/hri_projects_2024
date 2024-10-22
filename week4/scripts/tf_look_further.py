@@ -3,6 +3,7 @@ import rospy
 
 import math
 import tf2_ros
+import tf
 from sensor_msgs.msg import JointState
 import geometry_msgs.msg
 
@@ -16,19 +17,22 @@ def callback(data):
     overwrite.name = list(data.name)
     overwrite.position = list(data.position)
 
-    print(overwrite.position)
     try:
-        trans2 = tfBuffer.lookup_transform('torso', 'l_gripper', rospy.Time(0))    
+        # br.sendTransform((1.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0), rospy.Time.now(), "l_point", "LForeArm")
+        trans = tfBuffer.lookup_transform('torso', 'l_gripper', rospy.Time(0))    
+        trans2 = tfBuffer.lookup_transform('torso', 'LForeArm', rospy.Time(0))    
         hf_pitch = math.radians(45)
         hf_yaw = 0
+
         #Absoulte angle 180 is with reference to the torso, because it never moves 
         if len(overwrite.position) != 0:
-            hf_yaw = math.atan2(trans2.transform.translation.y, trans2.transform.translation.x)
-        hf_pitch += math.atan2(-trans2.transform.translation.z, trans2.transform.translation.x)
+            hf_yaw = math.atan2(trans.transform.translation.y -.05, trans.transform.translation.x + .05) 
+        hf_pitch += math.atan2(-trans2.transform.translation.z , trans2.transform.translation.x)
     
         overwrite.position[overwrite.name.index("HeadPitch")] = hf_pitch
         overwrite.position[overwrite.name.index("HeadYaw")] = hf_yaw
 
+        
         pub.publish(overwrite)
         rate.sleep()
         
@@ -44,7 +48,7 @@ if __name__ == '__main__':
     
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
-    
+    br = tf.TransformBroadcaster()
     pub = rospy.Publisher('joint_states', JointState, queue_size=10)  
     rospy.Subscriber('joint_states_input', JointState, callback)    
     rate = rospy.Rate(10)
@@ -54,5 +58,3 @@ if __name__ == '__main__':
     rate.sleep()
     
     rospy.spin()
-
-
