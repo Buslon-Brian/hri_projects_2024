@@ -24,10 +24,11 @@ def callback(data):
         hf_pitch = math.radians(45)
         hf_yaw = 0
 
-        #Absoulte angle 180 is with reference to the torso, because it never moves 
+        #Absoulte angle 180 is with reference to the torso, because it never moves
+        # pitch and yaw + .05 should add up to a meter ahead? 
         if len(overwrite.position) != 0:
             hf_yaw = math.atan2(trans.transform.translation.y -.05, trans.transform.translation.x + .05) 
-        hf_pitch += math.atan2(-trans2.transform.translation.z -.05, trans2.transform.translation.x)
+        hf_pitch += math.atan2(-trans2.transform.translation.z -.05, trans2.transform.translation.x + .05)
     
         overwrite.position[overwrite.name.index("HeadPitch")] = hf_pitch
         overwrite.position[overwrite.name.index("HeadYaw")] = hf_yaw
