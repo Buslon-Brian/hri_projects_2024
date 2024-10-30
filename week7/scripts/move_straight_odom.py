@@ -27,7 +27,7 @@ class MoveStraightOdom:
 if __name__ == '__main__':
     rospy.init_node('move_straight')
     n = MoveStraightOdom()
-    rate = rospy.Rate(15.0)
+    rate = rospy.Rate(10.0)
 
 
     # figure out where we started from
@@ -35,7 +35,8 @@ if __name__ == '__main__':
 
     # start the robot's movement
     t = Twist()
-    t.linear.x = 1.0
+    t.linear.y = 1.0
+    
     n.pub.publish(t)
 
     while not rospy.is_shutdown():
