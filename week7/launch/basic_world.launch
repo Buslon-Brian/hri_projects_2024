@@ -6,4 +6,6 @@
 	<!-- this loads a ROS node -->
 	<node pkg="stage_ros" type="stageros" name="stage" args="$(find week7)/world/basic.world" output="screen"/>
 
+	<node pkg="week7" type="detect_nearest.py" name="nearest" output="screen"/>
+	
 </launch>
