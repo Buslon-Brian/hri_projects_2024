@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     # start the robot's movement
     t = Twist()
-    t.linear.y = 1.0
+    t.linear.x = 1.0
     
     n.pub.publish(t)
 

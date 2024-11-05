@@ -7,6 +7,6 @@
 	<node pkg="stage_ros" type="stageros" name="stage" args="$(find week7)/world/basic.world" output="screen"/>
 
 	<!-- <node pkg="week7" type="move_straight_odom.py" name="move_straight_odom" output="screen"/> -->
-    <node pkg="week7" type="turn_odom.py" name="turn_odom" output="screen"/>
+    <node pkg="week7" type="square.py" name="square" output="screen"/>
 
 </launch>
