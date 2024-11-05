@@ -105,6 +105,20 @@ def sqaure(odom, twist, rate, size):
     turn(odom, twist ,rate, 90, True)
     move(odom, twist ,rate ,size)
 
+def triangle(odom, twist, rate, size):
+    move(odom, twist ,rate ,size)
+    turn(odom, twist ,rate, 120, True)
+    move(odom, twist ,rate ,size)
+    turn(odom, twist ,rate, 120, True)
+    move(odom, twist ,rate ,size)
+    turn(odom, twist ,rate, 120, True)
+
+    return 0
+
+def fig8(odom, twist, rate, size):
+    #circle in one direction, reverse x twist direction during the next circle
+    return 0
+
 #Main Statement
 if __name__ == '__main__':
     
@@ -113,6 +127,11 @@ if __name__ == '__main__':
     
     t = Twist()
     n = MoveOdom()
+    
+    print("square")
     sqaure(n, t, rate, 2)
-    # move(n, t , rate, 1)
-    # turn(n, t , rate, 180, True)
+    
+    print("triangle")
+    triangle(n, t ,rate, 2)
+    
+    
