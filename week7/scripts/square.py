@@ -30,7 +30,7 @@ class MoveOdom:
         (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
         return yaw
     
-#Move function 1 meter
+#Move function set distance
 def move(odom, twist, rate, distance):
     start = odom.get_odom()
     twist.linear.x = 1.0
@@ -84,6 +84,7 @@ def turn(odom, twist, rate, deg, clockwise):
                 break
 
         else:
+            #causes it to turn jsut a but too much, counteract it later?
             if arcdist == 0:
                 odom.pub.publish(twist)
 
@@ -95,6 +96,14 @@ def turn(odom, twist, rate, deg, clockwise):
 
         rate.sleep()
     
+def sqaure(odom, twist, rate, size):
+    move(odom, twist ,rate ,size)
+    turn(odom, twist ,rate, 90, True)
+    move(odom, twist ,rate ,size)
+    turn(odom, twist ,rate, 90, True)
+    move(odom, twist ,rate ,size)
+    turn(odom, twist ,rate, 90, True)
+    move(odom, twist ,rate ,size)
 
 #Main Statement
 if __name__ == '__main__':
@@ -104,6 +113,6 @@ if __name__ == '__main__':
     
     t = Twist()
     n = MoveOdom()
-
+    sqaure(n, t, rate, 2)
     # move(n, t , rate, 1)
-    turn(n, t , rate, 180, True)
+    # turn(n, t , rate, 180, True)
