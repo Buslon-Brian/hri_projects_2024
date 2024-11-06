@@ -1,0 +1,12 @@
+<launch>
+
+	<!-- this is needed to let ROS know that it should use the simulator to tell the time, rather than the wall clock -->
+	<param name="use_sim_time" type="str" value="true"/>
+
+	<!-- this loads a ROS node -->
+	<node pkg="stage_ros" type="stageros" name="stage" args="$(find week7)/world/basic.world" output="screen"/>
+
+	<!-- <node pkg="week7" type="move_straight_odom.py" name="move_straight_odom" output="screen"/> -->
+    <node pkg="week7" type="stop.py" name="square" output="screen"/>
+
+</launch>

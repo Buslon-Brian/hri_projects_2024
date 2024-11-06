@@ -29,6 +29,7 @@ class NumberCounter:
 if __name__ == '__main__':
     rospy.init_node('number_counter')
     n = NumberCounter()
+    t = Twist()
     #rospy.spin()
     rate = rospy.Rate(10.0)
     
