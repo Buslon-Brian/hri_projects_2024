@@ -30,6 +30,7 @@ class MoveOdom:
         (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
         return yaw
     
+
 #Move function set distance
 def move(odom, twist, rate, distance):
     start = odom.get_odom()
@@ -95,29 +96,48 @@ def turn(odom, twist, rate, deg, clockwise):
                 break  
 
         rate.sleep()
-    
-def sqaure(odom, twist, rate, size):
-    move(odom, twist ,rate ,size)
-    turn(odom, twist ,rate, 90, True)
-    move(odom, twist ,rate ,size)
-    turn(odom, twist ,rate, 90, True)
-    move(odom, twist ,rate ,size)
-    turn(odom, twist ,rate, 90, True)
-    move(odom, twist ,rate ,size)
 
-def triangle(odom, twist, rate, size):
-    move(odom, twist ,rate ,size)
-    turn(odom, twist ,rate, 120, True)
-    move(odom, twist ,rate ,size)
-    turn(odom, twist ,rate, 120, True)
-    move(odom, twist ,rate ,size)
-    turn(odom, twist ,rate, 120, True)
+def circle(odom, twist, rate, deg, clockwise,):
+    if clockwise == True:
+        dir = -1
 
-    return 0
+    else:
+        dir = 1
 
-def fig8(odom, twist, rate, size):
-    #circle in one direction, reverse x twist direction during the next circle
-    return 0
+    start = odom.get_yaw(odom.get_odom())
+    prev = start
+    sum_turn = 0
+    rad = math.radians(deg)
+
+    twist = Twist()
+    twist.angular.z = dir * 0.5
+    twist.linear.x = 1.5
+    odom.pub.publish(twist)
+
+    while not rospy.is_shutdown():
+
+        odom.pub.publish(twist)
+        cur = odom.get_yaw(odom.get_odom())
+        diff = math.fabs(cur - prev)
+
+        if diff > math.pi:
+           diff -= 2 * math.pi
+
+        prev = cur
+
+        sum_turn += diff
+        print(sum_turn)
+
+        if sum_turn > rad:
+            t.angular.z = 0.0
+            t.linear.x = 0.0
+            n.pub.publish(t)
+            break
+
+        rate.sleep()
+
+
+   
 
 #Main Statement
 if __name__ == '__main__':
@@ -128,10 +148,5 @@ if __name__ == '__main__':
     t = Twist()
     n = MoveOdom()
     
-    print("square")
-    sqaure(n, t, rate, 2)
-    
-    print("triangle")
-    triangle(n, t ,rate, 2)
-    
+   
     
