@@ -53,6 +53,7 @@ class MoveOdom:
         self.pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.sub = rospy.Subscriber("/odom", Odometry, self.odom_callback)
         self.sub = rospy.Subscriber('people_tracker_measurements', PositionMeasurementArray, self.tracker_callback)
+        self.laser = rospy.Subscriber('base_scan', LaserScan, self.laser_callback)
         rospy.sleep( rospy.Duration.from_sec(0.5) )
 
     def odom_callback(self, msg):
@@ -72,6 +73,12 @@ class MoveOdom:
 
     def detect_person(self):
         return self.tracker
+    
+    def laser_callback(self, msg):
+        self.laser = msg
+
+    def get_nearest(self):
+        return min(self.laser.ranges)
     
 
 #clockwise is a boolean true or false
@@ -134,18 +141,29 @@ if __name__ == '__main__':
         #if people found,
         while len(n.detect_person().people) > 0:
             
-            #print detected people
-                # for person in n.detect_person().people:
-                #     print(person.name)
-                #     print(person.reliability)
-                #     print(person.pos)
-                # print("/////")
-
+            
             #choose most reliable 
             target = max(n.detect_person().people,  key = attrgetter('reliability'))
     
-            #get transform
-            #turn toward object
-            #increase x until stopped
+            #calculate difference in angle
+            target_angle = math.atan2(target.pos.y, target.pos.x)
+            print(math.degrees(target_angle))
+            
+            #start moving unless object nearby
+            if n.get_nearest() > 0.5:
+                print("move")
+                
+                #increase twist x to 1
+                #if angle difference is large increase or decrease twist z value
+                # if abs(math.degrees(target_angle)) > 10:
+                    
+
+            else:
+                print("stop")            
+                #adjust twist values to zero
+                #publish
+
         
-        
+        print("person not detected")        
+        #make twist x = 0
+        #publish twist
