@@ -141,7 +141,6 @@ if __name__ == '__main__':
         #if people found,
         while len(n.detect_person().people) > 0:
             
-            
             #choose most reliable 
             target = max(n.detect_person().people,  key = attrgetter('reliability'))
     
@@ -151,19 +150,24 @@ if __name__ == '__main__':
             
             #start moving unless object nearby
             if n.get_nearest() > 0.5:
-                print("move")
+                t.linear.x = 1
                 
-                #increase twist x to 1
-                #if angle difference is large increase or decrease twist z value
-                # if abs(math.degrees(target_angle)) > 10:
+                if abs(math.degrees(target_angle)) > 10:
+                    t.angular.z = math.copysign(1, target_angle)
+            
+                else:
+                    t.angular.z = 0
+
+                n.pub.publish(t)
                     
 
             else:
-                print("stop")            
-                #adjust twist values to zero
-                #publish
+                t.linear.x = 0
+                t.angular.z = 0
+                n.pub.publish(t)
 
         
-        print("person not detected")        
-        #make twist x = 0
-        #publish twist
+        print("person not detected")
+        t.linear.x = 0
+        t.angular.z = 0
+        n.pub.publish(t)
