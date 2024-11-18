@@ -43,6 +43,7 @@ from people_msgs.msg import PositionMeasurementArray
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from operator import attrgetter
 
 
 class MoveOdom:
@@ -51,12 +52,11 @@ class MoveOdom:
 
         self.pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.sub = rospy.Subscriber("/odom", Odometry, self.odom_callback)
-        self.sub = rospy.Subscriber('leg_tracker_measurements', PositionMeasurementArray, self.tracker_callback)
+        self.sub = rospy.Subscriber('people_tracker_measurements', PositionMeasurementArray, self.tracker_callback)
         rospy.sleep( rospy.Duration.from_sec(0.5) )
 
     def odom_callback(self, msg):
         self.odom = msg
-
 
     def get_odom(self):
         return self.odom
@@ -131,15 +131,21 @@ if __name__ == '__main__':
     
     while not rospy.is_shutdown():
     
-        #if no legs, search
+        #if people found,
+        while len(n.detect_person().people) > 0:
+            
+            #print detected people
+                # for person in n.detect_person().people:
+                #     print(person.name)
+                #     print(person.reliability)
+                #     print(person.pos)
+                # print("/////")
 
-        #if legs,
             #choose most reliable 
+            target = max(n.detect_person().people,  key = attrgetter('reliability'))
+    
             #get transform
             #turn toward object
-            #move until stopped
+            #increase x until stopped
         
         
-        print("///////////////////////////////////")
-        print(n.detect_person())
-        rate.sleep()
