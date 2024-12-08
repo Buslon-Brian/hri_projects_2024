@@ -50,10 +50,10 @@ class MoveOdom:
     def __init__(self):
         self.odom = Odometry()
 
-        self.pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
-        self.sub = rospy.Subscriber("/odom", Odometry, self.odom_callback)
+        self.pub = rospy.Publisher("robot_0/cmd_vel", Twist, queue_size=10)
+        self.sub = rospy.Subscriber("robot_0/odom", Odometry, self.odom_callback)
         self.sub = rospy.Subscriber('people_tracker_measurements', PositionMeasurementArray, self.tracker_callback)
-        self.laser = rospy.Subscriber('base_scan', LaserScan, self.laser_callback)
+        self.laser = rospy.Subscriber('robot_0/base_scan', LaserScan, self.laser_callback)
         rospy.sleep( rospy.Duration.from_sec(0.5) )
 
     def odom_callback(self, msg):
@@ -146,7 +146,8 @@ if __name__ == '__main__':
     
             #calculate difference in angle
             target_angle = math.atan2(target.pos.y, target.pos.x)
-            print(math.degrees(target_angle))
+            print(target.pos.y, target.pos.x)
+            # print(math.degrees(target_angle))
             
             #start moving unless object nearby
             if n.get_nearest() > 0.5:
@@ -158,7 +159,7 @@ if __name__ == '__main__':
                 else:
                     t.angular.z = 0
 
-                n.pub.publish(t)
+                # n.pub.publish(t)
                     
 
             else:
