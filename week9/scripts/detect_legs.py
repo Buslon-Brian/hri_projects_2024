@@ -141,34 +141,49 @@ if __name__ == '__main__':
         #if people found,
         while len(n.detect_person().people) > 0:
             
-            #choose most reliable 
+            x0 = n.get_odom().pose.pose.position.x
+            y0 = n.get_odom().pose.pose.position.y
+            z0 = n.get_yaw(n.get_odom())
+            
             target = max(n.detect_person().people,  key = attrgetter('reliability'))
-    
-            #calculate difference in angle
-            target_angle = math.atan2(target.pos.y, target.pos.x)
-            print(target.pos.y, target.pos.x)
-            # print(math.degrees(target_angle))
+
+            x1 = target.pos.x
+            y1 = target.pos.y
+            z1 = math.atan2(y1 - y0, x1 - x0)
+            
+            z0 =math.degrees(z0)
+            z1 =math.degrees(z1)
+            print(f"{z0} {z1}")
             
             #start moving unless object nearby
             if n.get_nearest() > 0.5:
-                t.linear.x = 1
-                
-                if abs(math.degrees(target_angle)) > 10:
-                    t.angular.z = math.copysign(1, target_angle)
-            
-                else:
-                    t.angular.z = 0
+                t.linear.x = .5
 
-                # n.pub.publish(t)
+                if z1 - 10 < z0 < z1 + 10:
+                    print("maintain")
+                    t.angular.z = 0
+                     
+                else: 
+                    print("rotate")
+                    if z1 > z0:
+                        t.angular.z = .5
+
+                    else:
+                        t.angular.z = -.5
+
+                n.pub.publish(t)
                     
 
             else:
-                t.linear.x = 0
+                print("object near")
+                t.linear.x = -.5
                 t.angular.z = 0
                 n.pub.publish(t)
 
+            rate.sleep()
         
         print("person not detected")
         t.linear.x = 0
         t.angular.z = 0
         n.pub.publish(t)
+        rate.sleep()
