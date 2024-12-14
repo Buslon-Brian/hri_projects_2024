@@ -38,14 +38,42 @@
 
 import rospy
 from std_msgs.msg import String
+from std_msgs.msg import Bool
+from ros_vosk.msg import speech_recognition
 
+class Parrot:
+    def __init__(self):
+        self.listen = rospy.Subscriber('speech_recognition/vosk_result', speech_recognition, self.words) 
+        self.last_phrase = 0
 
+    def words(self,msg):
+        self.words = msg
 
-def callback(data):
-    print(data)
+    def speak(self):
+        try: 
+            self.words.isSpeech_recognized
+        
+        except AttributeError:
+            return ""
+       
+        else:
+            same_phrase = True if self.last_phrase == self.words.time_recognized.secs else False
+             
+            if self.words.isSpeech_recognized == True and same_phrase == False:
+                self.last_phrase = self.words.time_recognized.secs
+                return self.words.final_result
+            
+            else: 
+                return ""
+
 
 if __name__ == '__main__':
     rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber('speech_recognition/final_result', String, callback)
     rate = rospy.Rate(10)
-    rospy.spin()    
+    polly = Parrot()
+    
+    while not rospy.is_shutdown():
+        print(polly.speak())
+        rate.sleep()
+    
+    
