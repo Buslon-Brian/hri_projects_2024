@@ -38,18 +38,23 @@
 
 import rospy
 from std_msgs.msg import String
-from std_msgs.msg import Bool
 from ros_vosk.msg import speech_recognition
+import pyttsx3 
 
 class Parrot:
     def __init__(self):
         self.listen = rospy.Subscriber('speech_recognition/vosk_result', speech_recognition, self.words) 
+        self.repeat = rospy.Publisher('tts/phrase', String, queue_size=0)
+        self.tts = pyttsx3.init()
         self.last_phrase = 0
 
     def words(self,msg):
         self.words = msg
 
     def speak(self):
+        
+        self.tts.setProperty('rate', 120)
+
         try: 
             self.words.isSpeech_recognized
         
@@ -61,6 +66,9 @@ class Parrot:
              
             if self.words.isSpeech_recognized == True and same_phrase == False:
                 self.last_phrase = self.words.time_recognized.secs
+                self.tts.say(self.words.final_result)
+                self.tts.runAndWait()
+                self.repeat.publish(self.words.final_result)
                 return self.words.final_result
             
             else: 
