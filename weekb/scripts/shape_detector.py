@@ -79,48 +79,6 @@ class MoveOdom:
 
     def get_nearest(self):
         return min(self.laser.ranges)
-    
-
-#clockwise is a boolean true or false
-def turn(odom, twist, rate, deg, clockwise):
-    if clockwise == True:
-        c = -1
-
-    else: 
-        c = 1
-        deg = abs(360 - deg)
-        print(deg)
-        
-        
-
-    start = odom.get_yaw(odom.get_odom())
-    twist.angular.z = 0.5 * c
-    odom.pub.publish(twist)
-    radians = math.radians(deg)
-
-    while not rospy.is_shutdown():
-
-        odom.pub.publish(twist)
-        cur = odom.get_yaw(n.get_odom())
-        arcdist = math.fabs(cur - start)
-
-        if clockwise == True:
-            if arcdist > radians:
-                twist.angular.z = 0.0
-                odom.pub.publish(twist)
-                break
-
-        else:
-            #causes it to turn jsut a but too much, counteract it later?
-            if arcdist == 0:
-                odom.pub.publish(twist)
-
-            elif arcdist < radians:
-                twist.angular.z = 0.0
-                odom.pub.publish(twist)
-                break  
-
-        rate.sleep()
 
 
 if __name__ == '__main__':
@@ -131,4 +89,16 @@ if __name__ == '__main__':
     n = MoveOdom()
     
     while not rospy.is_shutdown():
+
+        people = n.detect_person().people
+        for person in people:
+            x = person.pos.x
+            y = person.pos.y
+            print(f"{x} {y}")
+
+        print("////////")
+            
+
+
+
         rate.sleep()
