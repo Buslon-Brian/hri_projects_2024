@@ -76,7 +76,7 @@ class Parrot:
 
 
 if __name__ == '__main__':
-    rospy.init_node('listener', anonymous=True)
+    rospy.init_node('parrot', anonymous=True)
     rate = rospy.Rate(10)
     polly = Parrot()
     
